@@ -348,28 +348,6 @@
             border: 1px solid rgba(231, 76, 60, 0.3);
         }
 
-        .optional-badge {
-            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            display: inline-block;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        .upload-area {
-            opacity: 0.8;
-            border-color: #bdc3c7;
-        }
-
-        .upload-area:hover {
-            opacity: 1;
-            border-color: #667eea;
-        }
-
         .generate-btn {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -479,6 +457,71 @@
             transition: width 0.3s ease;
         }
 
+        .countdown-container {
+            display: none;
+            text-align: center;
+            margin-top: 30px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .countdown-container.show {
+            display: block;
+        }
+
+        .countdown-circle {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px;
+        }
+
+        .countdown-svg {
+            transform: rotate(-90deg);
+            width: 150px;
+            height: 150px;
+        }
+
+        .countdown-circle-bg {
+            fill: none;
+            stroke: #e1e8ed;
+            stroke-width: 8;
+        }
+
+        .countdown-circle-progress {
+            fill: none;
+            stroke: url(#gradient);
+            stroke-width: 8;
+            stroke-linecap: round;
+            stroke-dasharray: 440;
+            stroke-dashoffset: 440;
+            transition: stroke-dashoffset 0.1s linear;
+        }
+
+        .countdown-time {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .countdown-message {
+            font-size: 1.1rem;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .countdown-status {
+            font-size: 0.9rem;
+            color: #666;
+            font-style: italic;
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 10px;
@@ -580,6 +623,24 @@
                 <div class="progress-fill" id="progressFill"></div>
             </div>
 
+            <div class="countdown-container" id="countdownContainer">
+                <div class="countdown-message" id="countdownMessage">AI is working on your custom CV...</div>
+                <div class="countdown-circle">
+                    <svg class="countdown-svg">
+                        <defs>
+                            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <circle class="countdown-circle-bg" cx="75" cy="75" r="70"></circle>
+                        <circle class="countdown-circle-progress" cx="75" cy="75" r="70" id="countdownCircle"></circle>
+                    </svg>
+                    <div class="countdown-time" id="countdownTime">2:54</div>
+                </div>
+                <div class="countdown-status" id="countdownStatus">Please wait while we customize your CV...</div>
+            </div>
+
             <div class="result-section" id="resultSection">
                 <!-- Results will appear here -->
             </div>
@@ -598,6 +659,8 @@
         let isProcessing = false;
         let isUploaded = false;
         let uploadedFilesList = [];
+        let countdownTimer = null;
+        let countdownSeconds = 174; // 2.9 minutes = 174 seconds
 
         // DOM elements
         const uploadArea = document.getElementById('uploadArea');
@@ -612,6 +675,11 @@
         const btnText = document.getElementById('btnText');
         const progressBar = document.getElementById('progressBar');
         const progressFill = document.getElementById('progressFill');
+        const countdownContainer = document.getElementById('countdownContainer');
+        const countdownTime = document.getElementById('countdownTime');
+        const countdownMessage = document.getElementById('countdownMessage');
+        const countdownStatus = document.getElementById('countdownStatus');
+        const countdownCircle = document.getElementById('countdownCircle');
         const resultSection = document.getElementById('resultSection');
 
         // File upload handlers
@@ -735,7 +803,7 @@
                 showUploadError(error.message);
             } finally {
                 uploadBtn.disabled = false;
-                uploadBtnText.innerHTML = '📤 Upload CVs to Cloud';
+                uploadBtnText.innerHTML = '📤 Upload Documents to Cloud';
             }
         }
 
@@ -814,6 +882,7 @@
                 isProcessing = true;
                 updateButtonState(true);
                 showProgress();
+                showCountdown();
                 hideResults();
 
                 // Step 1: Search for existing CVs (40% progress)  
@@ -857,14 +926,20 @@
                 // Step 2: Complete (100% progress)
                 updateProgress(100, `Custom ${jobRole} CV generated successfully!`);
                 
+                // Stop countdown and show results
+                stopCountdown();
+                
                 setTimeout(() => {
                     hideProgress();
+                    hideCountdown();
                     showResults(result);
                 }, 1000);
 
             } catch (error) {
                 console.error('Error:', error);
                 hideProgress();
+                stopCountdown();
+                hideCountdown();
                 
                 let errorMessage = error.message;
                 
@@ -890,10 +965,6 @@
             return userNameInput.value.trim() || 'user';
         }
 
-        function extractUserName() {
-            return userNameInput.value.trim() || 'user';
-        }
-
         function updateButtonState(processing) {
             generateBtn.disabled = processing;
             if (processing) {
@@ -910,12 +981,66 @@
 
         function updateProgress(percent, message) {
             progressFill.style.width = `${percent}%`;
-            // You could add a status message element here if needed
         }
 
         function hideProgress() {
             progressBar.style.display = 'none';
             progressFill.style.width = '0%';
+        }
+
+        function showCountdown() {
+            countdownSeconds = 100; // Reset to 2.9 minutes (174 seconds)
+            countdownContainer.classList.add('show');
+            updateCountdownDisplay();
+            startCountdown();
+        }
+
+        function hideCountdown() {
+            countdownContainer.classList.remove('show');
+        }
+
+        function startCountdown() {
+            countdownTimer = setInterval(() => {
+                countdownSeconds--;
+                updateCountdownDisplay();
+                
+                if (countdownSeconds <= 0) {
+                    // Time ran out, add more time
+                    countdownSeconds = 30; // Add 30 more seconds
+                    countdownMessage.textContent = "Taking a bit longer than expected...";
+                    countdownStatus.textContent = "Adding more time - almost there!";
+                }
+            }, 1000);
+        }
+
+        function stopCountdown() {
+            if (countdownTimer) {
+                clearInterval(countdownTimer);
+                countdownTimer = null;
+            }
+        }
+
+        function updateCountdownDisplay() {
+            const minutes = Math.floor(countdownSeconds / 60);
+            const seconds = countdownSeconds % 60;
+            const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            
+            countdownTime.textContent = timeString;
+            
+            // Update circular progress (440 is the circumference of the circle)
+            const progress = ((100 - countdownSeconds) / 100) * 440;
+            countdownCircle.style.strokeDashoffset = 440 - progress;
+            
+            // Update status messages based on time remaining
+            if (countdownSeconds > 45) {
+                countdownStatus.textContent = "Please wait while we customize your CV...";
+            } else if (countdownSeconds > 30) {
+                countdownStatus.textContent = "AI is analyzing your experience and skills...";
+            } else if (countdownSeconds > 15) {
+                countdownStatus.textContent = "Almost ready - finalizing your custom CV...";
+            } else {
+                countdownStatus.textContent = "Just a few more seconds...";
+            }
         }
 
         function showResults(result) {
