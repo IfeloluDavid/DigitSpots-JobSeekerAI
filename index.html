@@ -937,6 +937,7 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
 
+        // UPDATED: Presigned URL upload implementation
         async function uploadFilesToCloud() {
             if (uploadedFiles.length === 0) {
                 showUploadError('Please select files to upload');
@@ -949,7 +950,7 @@
                 uploadStatus.innerHTML = '';
                 uploadStatus.className = 'upload-status';
 
-                const result = await uploadFiles();
+                const result = await uploadFilesWithPresignedUrls();
                 
                 // Success
                 isUploaded = true;
@@ -966,57 +967,78 @@
             }
         }
 
-        async function uploadFiles() {
+        // UPDATED: New function using presigned URLs
+        async function uploadFilesWithPresignedUrls() {
             if (uploadedFiles.length === 0) {
                 throw new Error('Please select at least one CV file');
             }
 
-            // Convert files to base64 for JSON transmission
-            const filesData = await Promise.all(
-                uploadedFiles.map(async (file) => {
-                    const base64Content = await fileToBase64(file);
-                    return {
-                        filename: file.name,
-                        content: base64Content.split(',')[1] // Remove data:application/pdf;base64, prefix
-                    };
-                })
-            );
+            const uploadedFilesData = [];
 
-            try {
-                const response = await fetch(API_CONFIG.UPLOAD_LAMBDA_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(filesData)
-                });
+            for (let i = 0; i < uploadedFiles.length; i++) {
+                const file = uploadedFiles[i];
+                
+                try {
+                    uploadStatus.innerHTML = `Requesting presigned URL for ${file.name} (${i + 1}/${uploadedFiles.length})...`;
+                    
+                    // Step 1: Request presigned URL from Lambda
+                    const presignResponse = await fetch(API_CONFIG.UPLOAD_LAMBDA_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            fileName: file.name,
+                            fileType: file.type
+                        })
+                    });
 
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    throw new Error(errorData.error || `Upload failed: ${response.statusText}`);
+                    if (!presignResponse.ok) {
+                        const errorData = await presignResponse.json().catch(() => ({}));
+                        throw new Error(errorData.error || `Failed to get presigned URL for ${file.name}: ${presignResponse.statusText}`);
+                    }
+
+                    const { url, key } = await presignResponse.json();
+
+                    // Step 2: Upload file directly to S3 using presigned URL
+                    uploadStatus.innerHTML = `Uploading ${file.name} to S3 (${i + 1}/${uploadedFiles.length})...`;
+                    
+                    const s3UploadResponse = await fetch(url, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': file.type
+                        },
+                        body: file
+                    });
+
+                    if (!s3UploadResponse.ok) {
+                        throw new Error(`Failed to upload ${file.name} to S3: ${s3UploadResponse.statusText}`);
+                    }
+
+                    // Track successful upload
+                    uploadedFilesData.push({
+                        original_filename: file.name,
+                        s3_key: key,
+                        size: file.size
+                    });
+
+                    console.log(`Successfully uploaded ${file.name} with key: ${key}`);
+
+                } catch (fileError) {
+                    console.error(`Error uploading ${file.name}:`, fileError);
+                    throw new Error(`Failed to upload ${file.name}: ${fileError.message}`);
                 }
-
-                const result = await response.json();
-                console.log('Upload successful:', result);
-                return result;
-
-            } catch (error) {
-                console.error('Upload error:', error);
-                throw new Error(`Failed to upload files: ${error.message}`);
             }
-        }
 
-        function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-            });
+            return {
+                files: uploadedFilesData,
+                total_files: uploadedFilesData.length,
+                bucket: "rag-documentation-an"
+            };
         }
 
         function showUploadError(message) {
-            uploadStatus.innerHTML = `❌ ${message}`;
+            uploadStatus.innerHTML = `⚠ ${message}`;
             uploadStatus.className = 'upload-status error';
         }
 
@@ -1222,7 +1244,7 @@
             } else {
                 resultHTML = `
                     <div class="error-message">
-                        ❌ Failed to generate CV. Please try again or contact support.
+                        ⚠ Failed to generate CV. Please try again or contact support.
                     </div>
                 `;
             }
@@ -1234,7 +1256,7 @@
         function showError(message) {
             const errorHTML = `
                 <div class="error-message">
-                    ❌ ${message}
+                    ⚠ ${message}
                 </div>
             `;
             resultSection.innerHTML = errorHTML;
