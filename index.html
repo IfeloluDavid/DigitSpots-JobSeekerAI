@@ -51,6 +51,9 @@
             text-align: center;
             margin-bottom: 40px;
             color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .company-logo {
@@ -65,6 +68,7 @@
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
             overflow: hidden;
+            width: fit-content;
         }
 
         .company-logo::before {
@@ -681,24 +685,260 @@
         }
 
         @media (max-width: 768px) {
+            body {
+                animation: gradientShift 20s ease infinite;
+            }
+
+            body::before {
+                opacity: 0.7;
+            }
+
+            .container {
+                padding: 15px;
+            }
+
+            .header {
+                margin-bottom: 30px;
+            }
+
+            .company-logo {
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                padding: 20px 30px;
+                margin-bottom: 20px;
+                border-radius: 25px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .company-logo img {
+                height: 50px;
+                margin-bottom: 10px;
+            }
+
+            .company-name {
+                font-size: 1.6rem;
+                letter-spacing: -0.3px;
+            }
+
+            .company-tagline {
+                font-size: 0.85rem;
+            }
+
+            h1 {
+                font-size: 2.2rem;
+                margin-bottom: 10px;
+            }
+
+            .subtitle {
+                font-size: 1.1rem;
+                padding: 0 10px;
+            }
+
+            .aws-badge {
+                font-size: 0.8rem;
+                padding: 6px 16px;
+                margin-top: 10px;
+            }
+
+            .main-card {
+                padding: 25px 20px;
+                border-radius: 25px;
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+            }
+
+            .instructions {
+                padding: 20px;
+                border-radius: 15px;
+                margin-bottom: 25px;
+            }
+
+            .instructions h2 {
+                font-size: 1.3rem;
+                margin-bottom: 12px;
+            }
+
+            .steps li {
+                font-size: 0.95rem;
+                padding-left: 45px;
+                margin-bottom: 12px;
+            }
+
+            .steps li::before {
+                width: 28px;
+                height: 28px;
+                font-size: 0.85rem;
+            }
+
+            .form-section h3 {
+                font-size: 1.15rem;
+                margin-bottom: 12px;
+            }
+
+            .upload-area {
+                padding: 30px 20px;
+                border-radius: 20px;
+                border-width: 2px;
+            }
+
+            .upload-icon {
+                font-size: 2.5rem;
+                margin-bottom: 12px;
+            }
+
+            .upload-text {
+                font-size: 1rem;
+                margin-bottom: 8px;
+            }
+
+            .upload-subtext {
+                font-size: 0.8rem;
+                padding: 0 10px;
+            }
+
+            .file-item {
+                padding: 12px;
+                border-radius: 8px;
+            }
+
+            .file-name {
+                font-size: 0.9rem;
+                word-break: break-word;
+            }
+
+            .file-size {
+                font-size: 0.8rem;
+            }
+
+            .text-input {
+                padding: 12px 16px;
+                font-size: 0.95rem;
+                border-radius: 10px;
+            }
+
+            .input-hint {
+                font-size: 0.8rem;
+            }
+
+            .upload-files-btn {
+                padding: 12px 25px;
+                font-size: 0.95rem;
+                border-radius: 20px;
+                min-width: 180px;
+            }
+
+            .generate-btn {
+                padding: 16px 35px;
+                font-size: 1.1rem;
+                border-radius: 50px;
+                min-width: 200px;
+                animation: gradientMove 4s ease infinite;
+            }
+
+            .countdown-container {
+                padding: 20px;
+                margin-top: 20px;
+            }
+
+            .countdown-circle {
+                width: 120px;
+                height: 120px;
+            }
+
+            .countdown-svg {
+                width: 120px;
+                height: 120px;
+            }
+
+            .countdown-circle-progress,
+            .countdown-circle-bg {
+                stroke-width: 6;
+            }
+
+            .countdown-time {
+                font-size: 1.5rem;
+            }
+
+            .countdown-message {
+                font-size: 1rem;
+                padding: 0 10px;
+            }
+
+            .countdown-status {
+                font-size: 0.85rem;
+                padding: 0 10px;
+            }
+
+            .success-message,
+            .error-message {
+                padding: 16px;
+                border-radius: 12px;
+                font-size: 0.95rem;
+            }
+
+            .download-btn {
+                padding: 14px 28px;
+                font-size: 1rem;
+                border-radius: 40px;
+            }
+
+            .input-fields-area {
+                padding: 20px;
+                border-radius: 12px;
+            }
+
+            button,
+            .upload-area,
+            .text-input {
+                min-height: 44px;
+            }
+
+            .main-card:hover,
+            .company-logo:hover,
+            .instructions:hover,
+            .upload-area:hover {
+                transform: none;
+            }
+        }
+
+        @media (max-width: 480px) {
             .container {
                 padding: 10px;
             }
 
-            .main-card {
-                padding: 20px;
-            }
-
-            h1 {
-                font-size: 2rem;
+            .company-logo {
+                padding: 15px 25px;
             }
 
             .company-name {
+                font-size: 1.4rem;
+            }
+
+            h1 {
                 font-size: 1.8rem;
             }
 
+            .subtitle {
+                font-size: 1rem;
+            }
+
+            .main-card {
+                padding: 20px 15px;
+            }
+
+            .instructions {
+                padding: 15px;
+            }
+
             .upload-area {
-                padding: 20px;
+                padding: 25px 15px;
+            }
+
+            .generate-btn {
+                padding: 14px 30px;
+                font-size: 1rem;
+                min-width: 180px;
             }
         }
     </style>
@@ -727,6 +967,59 @@
                 </ol>
             </div>
 
+            <div class="form-section">
+                <h3>👋 Quick Registration</h3>
+                <div class="input-fields-area" style="margin-bottom: 25px;">
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="regName">Full Name</label>
+                            <input 
+                                type="text" 
+                                id="regName" 
+                                class="text-input" 
+                                placeholder="Enter your full name"
+                                autocomplete="name"
+                                required
+                            >
+                        </div>
+                    </div>
+                    
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="regEmail">Email Address</label>
+                            <input 
+                                type="email" 
+                                id="regEmail" 
+                                class="text-input" 
+                                placeholder="your.email@example.com"
+                                autocomplete="email"
+                                required
+                            >
+                        </div>
+                    </div>
+                    
+                    <div class="input-row" style="margin-bottom: 0;">
+                        <div class="input-group">
+                            <label for="regPhone">Phone Number</label>
+                            <input 
+                                type="tel" 
+                                id="regPhone" 
+                                class="text-input" 
+                                placeholder="+XXX XXX XXX XXXX"
+                                autocomplete="tel"
+                                required
+                            >
+                        </div>
+                    </div>
+                    
+                    <button id="registerBtn" class="upload-files-btn" style="display: flex; margin-top: 20px;">
+                        <span id="registerBtnText">🚀 Register & Continue</span>
+                    </button>
+                    <div class="upload-status" id="registerStatus"></div>
+                </div>
+            </div>
+
+            <div id="mainFormSection" style="opacity: 0.5; pointer-events: none; transition: all 0.4s ease;">
             <div class="form-section">
                 <h3>📁 Upload Your CVs and Supporting Documents</h3>
                 <div class="upload-area" id="uploadArea">
@@ -804,13 +1097,15 @@
                 <!-- Results will appear here -->
             </div>
         </div>
+        </div>
     </div>
 
     <script>
         // Configuration - Using Lambda Function URLs (no API Gateway needed)
         const API_CONFIG = {
             UPLOAD_LAMBDA_URL: 'https://vk3xa2y4yhpadrd2gszevft6f40tofbe.lambda-url.us-east-2.on.aws/',
-            GENERATE_LAMBDA_URL: 'https://sp7tirtjvcnfxedmty7bexj3540uhmfd.lambda-url.us-east-2.on.aws/'
+            GENERATE_LAMBDA_URL: 'https://sp7tirtjvcnfxedmty7bexj3540uhmfd.lambda-url.us-east-2.on.aws/',
+            REGISTER_LAMBDA_URL: 'https://hzwjrr4ava5mhhvn4ctwo5ptpi0dbzhd.lambda-url.us-east-2.on.aws/'
         };
 
         // Global state
@@ -820,8 +1115,17 @@
         let uploadedFilesList = [];
         let countdownTimer = null;
         let countdownSeconds = 174; // 2.9 minutes = 174 seconds
+        let isRegistered = false;
+        let userData = {};
 
         // DOM elements
+        const regNameInput = document.getElementById('regName');
+        const regEmailInput = document.getElementById('regEmail');
+        const regPhoneInput = document.getElementById('regPhone');
+        const registerBtn = document.getElementById('registerBtn');
+        const registerBtnText = document.getElementById('registerBtnText');
+        const registerStatus = document.getElementById('registerStatus');
+        const mainFormSection = document.getElementById('mainFormSection');
         const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileInput');
         const uploadedFilesContainer = document.getElementById('uploadedFiles');
@@ -842,6 +1146,7 @@
         const resultSection = document.getElementById('resultSection');
 
         // File upload handlers
+        registerBtn.addEventListener('click', handleRegistration);
         uploadArea.addEventListener('click', () => fileInput.click());
         uploadArea.addEventListener('dragover', handleDragOver);
         uploadArea.addEventListener('dragleave', handleDragLeave);
@@ -849,6 +1154,95 @@
         fileInput.addEventListener('change', handleFileSelect);
         uploadBtn.addEventListener('click', uploadFilesToCloud);
         generateBtn.addEventListener('click', generateCustomCV);
+
+        // Registration handler
+        async function handleRegistration() {
+            const name = regNameInput.value.trim();
+            const email = regEmailInput.value.trim();
+            const phone = regPhoneInput.value.trim();
+
+            // Validation
+            if (!name || !email || !phone) {
+                showRegisterError('Please fill in all fields');
+                return;
+            }
+
+            // Email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showRegisterError('Please enter a valid email address');
+                return;
+            }
+
+            // Phone validation (basic)
+            const phoneRegex = /^[+]?[\d\s()-]{10,}$/;
+            if (!phoneRegex.test(phone)) {
+                showRegisterError('Please enter a valid phone number');
+                return;
+            }
+
+            try {
+                registerBtn.disabled = true;
+                registerBtnText.innerHTML = '<div class="spinner"></div> Registering...';
+                registerStatus.innerHTML = '';
+                registerStatus.className = 'upload-status';
+
+                // Call Lambda function
+                const response = await fetch(API_CONFIG.REGISTER_LAMBDA_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        email: email,
+                        phone: phone,
+                        timestamp: new Date().toISOString()
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || `Registration failed: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+
+                // Success
+                isRegistered = true;
+                userData = { name, email, phone };
+                
+                registerStatus.innerHTML = '✅ Registration successful! You can now proceed.';
+                registerStatus.className = 'upload-status success';
+                
+                // Disable form fields
+                regNameInput.disabled = true;
+                regEmailInput.disabled = true;
+                regPhoneInput.disabled = true;
+                registerBtn.style.display = 'none';
+                
+                // Enable main form section
+                mainFormSection.style.opacity = '1';
+                mainFormSection.style.pointerEvents = 'auto';
+                
+                // Scroll to main section
+                setTimeout(() => {
+                    mainFormSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 500);
+
+            } catch (error) {
+                console.error('Registration error:', error);
+                showRegisterError(error.message || 'Registration failed. Please try again.');
+            } finally {
+                registerBtn.disabled = false;
+                registerBtnText.innerHTML = '🚀 Register & Continue';
+            }
+        }
+
+        function showRegisterError(message) {
+            registerStatus.innerHTML = `⚠ ${message}`;
+            registerStatus.className = 'upload-status error';
+        }
 
         function handleDragOver(e) {
             e.preventDefault();
